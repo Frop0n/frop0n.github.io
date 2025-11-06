@@ -1,8 +1,17 @@
+
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize Three.js particle system
     initParticleSystem();
-    
-    // GSAP animations for smooth transitions
+
+    // Check for scroll animations support
+    if (!CSS.supports('animation-timeline: view()')) {
+        // Fallback for browsers without scroll animations
+        document.querySelectorAll('#services .bg-gray-800\\/85, #team .bg-gray-800\\/50, #contact .contact-method').forEach(el => {
+            el.style.opacity = '1';
+            el.style.transform = 'none';
+        });
+    }
+// GSAP animations for smooth transitions
     gsap.from("#logo-container h1", {
         duration: 2,
         opacity: 0,
@@ -10,16 +19,20 @@ document.addEventListener('DOMContentLoaded', () => {
         ease: "power3.out",
         delay: 0.5
     });
-    
     gsap.from("p", {
         duration: 1.5,
         opacity: 0,
         y: 30,
         ease: "power2.out",
-        delay: 1.2
+        delay: 1.2,
+        textShadow: "0 2px 4px rgba(0,0,0,0)"
     });
-    
-    gsap.from("a", {
+    gsap.to("p", {
+        duration: 1,
+        textShadow: "0 2px 4px rgba(0,0,0,0.5)",
+        delay: 2.2
+    });
+gsap.from("a", {
         duration: 1,
         opacity: 0,
         y: 20,
@@ -43,10 +56,17 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     };
-
     animateCards(".service-card");
     animateCards(".team-card");
     animateCards(".contact-method");
+    
+    // Fallback for browsers without scroll animations
+    if (!CSS.supports('animation-timeline: view()')) {
+        document.querySelectorAll('#contact .contact-method').forEach(el => {
+            el.style.opacity = '1';
+            el.style.transform = 'none';
+        });
+    }
 });
 function initParticleSystem() {
     const container = document.getElementById('particle-container');
@@ -298,18 +318,18 @@ const floatX = ox * 0.95 + spiralX;
         sizes[i] = (0.5 + Math.random() * 1.5) * (0.7 + Math.sin(t * 10 + i) * 0.3);
 particles.attributes.size.needsUpdate = true;
 // Apply enhanced mouse effects
-        const targetX = floatX + (mouse.x * 10 - floatX) * mouseEffect;
-        const targetY = floatY + (mouse.y * 10 - floatY) * mouseEffect;
-        
-        // Apply clockwise rotational force
-        const rotAngle = Math.atan2(floatY, floatX) + Math.PI/2;
-        const rotForce = 0.1 * (1 + Math.sin(time * 2 + i * 0.01));
-        const rotX = Math.cos(rotAngle) * rotForce;
-        const rotY = Math.sin(rotAngle) * rotForce;
-        
-        positions[i3] = targetX + rotX * (1 - mouseEffect * 0.5);
-        positions[i3+1] = targetY + rotY * (1 - mouseEffect * 0.5);
-        positions[i3+2] = floatZ + (mouseEffect * 5 - floatZ) * attractEffect * 0.2;
+            const targetX = floatX + (mouse.x * 10 - floatX) * mouseEffect;
+            const targetY = floatY + (mouse.y * 10 - floatY) * mouseEffect;
+            
+            // Apply clockwise rotational force (reduced strength)
+            const rotAngle = Math.atan2(floatY, floatX) + Math.PI/2;
+            const rotForce = 0.05 * (1 + Math.sin(time * 2 + i * 0.01));  // Reduced from 0.1
+            const rotX = Math.cos(rotAngle) * rotForce;
+            const rotY = Math.sin(rotAngle) * rotForce;
+            
+            positions[i3] = targetX + rotX * (1 - mouseEffect * 0.5);
+            positions[i3+1] = targetY + rotY * (1 - mouseEffect * 0.5);
+            positions[i3+2] = floatZ + (mouseEffect * 5 - floatZ) * attractEffect * 0.1;  // Reduced from 0.2
 }
 particles.attributes.position.needsUpdate = true;
         // Animate main vortex
@@ -360,21 +380,170 @@ renderer.render(scene, camera);
         camera.updateProjectionMatrix();
         renderer.setSize(width, height);
     });
-    // Logo hover effect
-    const letters = document.querySelectorAll('.letter');
-    letters.forEach((letter) => {
-        letter.addEventListener('mouseenter', () => {
-            gsap.to(letter, {
-                scale: 1.05,
-                duration: 0.2
-            });
-        });
+    // Initialize particle text
+    initParticleText();
+    function initParticleText() {
+        const canvas = document.getElementById('particle-text');
+        const ctx = canvas.getContext('2d');
+        const container = document.getElementById('particle-text-container');
+        const isMobile = window.innerWidth < 768;
         
-        letter.addEventListener('mouseleave', () => {
-            gsap.to(letter, {
-                scale: 1,
-                duration: 0.2
+        // Set canvas size
+        function resizeCanvas() {
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // Mobile fallback - simple text
+        if (isMobile) {
+            function drawSimpleText() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.font = '900 48px Montserrat';
+                ctx.fillStyle = 'white';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('BOLSILLO', canvas.width/2, canvas.height/2);
+            }
+            drawSimpleText();
+            window.addEventListener('resize', drawSimpleText);
+            return;
+        }
+
+        // Desktop particle effect
+        const text = "BOLSILLO";
+        const baseFontSize = 0.15;
+        const fontSize = Math.min(canvas.width * baseFontSize, 120);
+        const fontFamily = 'Montserrat';
+        const fontWeight = '900';
+// Particle settings
+        const particleSize = isMobile ? 2 : 3;
+        const particleSpacing = isMobile ? 3 : 4;
+        const attractionRadius = isMobile ? 50 : 100;
+        const attractionForce = isMobile ? 0.7 : 0.5;
+        const repulsionRadius = isMobile ? 30 : 50;
+        const repulsionForce = isMobile ? 1 : 0.8;
+        const friction = isMobile ? 0.2 : 0.3;
+// Create particles
+        let particles = [];
+        
+        // Draw text to get particle positions
+        ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        // Get text metrics
+        const textWidth = ctx.measureText(text).width;
+        const textHeight = fontSize;
+        
+        // Create off-screen canvas to analyze text pixels
+        const offscreenCanvas = document.createElement('canvas');
+        const offscreenCtx = offscreenCanvas.getContext('2d');
+        offscreenCanvas.width = textWidth + 20;
+        offscreenCanvas.height = textHeight + 20;
+        
+        // Draw text on off-screen canvas
+        offscreenCtx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+        offscreenCtx.textAlign = 'center';
+        offscreenCtx.textBaseline = 'middle';
+        offscreenCtx.fillStyle = 'white';
+        offscreenCtx.fillText(text, offscreenCanvas.width/2, offscreenCanvas.height/2);
+        
+        // Get pixel data and create particles
+        const imageData = offscreenCtx.getImageData(0, 0, offscreenCanvas.width, offscreenCanvas.height);
+        const data = imageData.data;
+        
+        for (let y = 0; y < offscreenCanvas.height; y += particleSpacing) {
+            for (let x = 0; x < offscreenCanvas.width; x += particleSpacing) {
+                const index = (y * offscreenCanvas.width + x) * 4;
+                if (data[index + 3] > 128) { // If pixel is not transparent
+                    particles.push({
+                        x: (canvas.width/2 - textWidth/2) + x,
+                        y: (canvas.height/2 - textHeight/2) + y,
+                        originX: (canvas.width/2 - textWidth/2) + x,
+                        originY: (canvas.height/2 - textHeight/2) + y,
+                        vx: 0,
+                        vy: 0,
+                        size: particleSize,
+                        color: 'white'
+                    });
+                }
+            }
+        }
+        
+        // Mouse interaction
+        let mouse = { x: null, y: null, isActive: false };
+        // Handle both mouse and touch events
+        const handlePointerMove = (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.clientX || e.touches?.[0]?.clientX;
+            const clientY = e.clientY || e.touches?.[0]?.clientY;
+            
+            if (clientX && clientY) {
+                mouse.x = clientX - rect.left;
+                mouse.y = clientY - rect.top;
+                mouse.isActive = true;
+            }
+        };
+
+        const handlePointerEnd = () => {
+            mouse.isActive = false;
+        };
+
+        canvas.addEventListener('mousemove', handlePointerMove);
+        canvas.addEventListener('touchmove', handlePointerMove, { passive: false });
+        canvas.addEventListener('mouseleave', handlePointerEnd);
+        canvas.addEventListener('touchend', handlePointerEnd);
+// Animation loop
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Update particles
+            particles.forEach(p => {
+                // Calculate distance to mouse
+                if (mouse.isActive) {
+                    const dx = p.x - mouse.x;
+                    const dy = p.y - mouse.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < repulsionRadius) {
+                        // Repel from mouse
+                        const angle = Math.atan2(dy, dx);
+                        const force = (repulsionRadius - distance) / repulsionRadius * repulsionForce;
+                        p.vx += Math.cos(angle) * force;
+                        p.vy += Math.sin(angle) * force;
+                    }
+                }
+        // Attract to origin position (70x faster return)
+        const ox = p.x - p.originX;
+        const oy = p.y - p.originY;
+        const odistance = Math.sqrt(ox * ox + oy * oy);
+        
+        if (odistance > 0) {
+            const angle = Math.atan2(oy, ox);
+            const force = Math.min(odistance, attractionRadius) / attractionRadius * (attractionForce * 20); 
+            p.vx -= Math.cos(angle) * force;
+            p.vy -= Math.sin(angle) * force;
+        }
+        
+        // Apply friction (reduced to allow faster return)
+        p.vx *= 0.9; // Lower friction value
+        p.vy *= 0.9; // Lower friction value
+// Update position
+                p.x += p.vx;
+                p.y += p.vy;
+                
+                // Draw particle
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.fill();
             });
-        });
-    });
+            
+            requestAnimationFrame(animate);
+        }
+        
+        animate();
+    }
 }
