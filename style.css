@@ -43,13 +43,20 @@ main {
     cursor: pointer;
     filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
 }
-
 @media (max-width: 768px) {
     #particle-text-container {
-        height: 80px;
+        height: 100px;
+        min-height: 100px;
     }
     #particle-text {
         pointer-events: none;
+    }
+}
+
+@media (max-width: 480px) {
+    #particle-text-container {
+        height: 80px;
+        min-height: 80px;
     }
 }
 /* Tagline styles */
