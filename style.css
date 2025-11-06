@@ -31,63 +31,118 @@ body {
 main {
     backdrop-filter: blur(2px);
 }
-/* Logo animation */
-#logo-container {
+/* Particle Text Container */
+#particle-text-container {
+    margin-bottom: 1.5rem;
     perspective: 1000px;
 }
-#logo-container h1 {
-    animation: float 6s ease-in-out infinite;
-    display: inline-block;
-    font-weight: 900;
-    letter-spacing: -0.05em;
-    text-transform: uppercase;
-    margin-bottom: 0.5rem;
+
+#particle-text {
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
 }
-.letter {
-    display: inline-block;
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    transform-origin: center bottom;
-    cursor: default;
-    will-change: transform;
-    padding: 0 2px;
-    margin: 0 -2px;
-    position: relative;
-    text-stroke: 1px rgba(255,255,255,0.2);
-    -webkit-text-stroke: 1px rgba(255,255,255,0.2);
+
+@media (max-width: 768px) {
+    #particle-text-container {
+        height: 80px;
+    }
+    #particle-text {
+        pointer-events: none;
+    }
 }
-/* Staggered letter positioning */
-.letter:nth-child(1) { transform: translateY(8px); }
-.letter:nth-child(2) { transform: translateY(-5px); }
-.letter:nth-child(3) { transform: translateY(10px); }
-.letter:nth-child(4) { transform: translateY(-8px); }
-.letter:nth-child(5) { transform: translateY(5px); }
-.letter:nth-child(6) { transform: translateY(-10px); }
-.letter:nth-child(7) { transform: translateY(7px); }
-.letter:nth-child(8) { transform: translateY(-3px); }
+/* Tagline styles */
+.hero-section p {
+    font-size: 1.5rem;
+    max-width: 36rem;
+    line-height: 1.5;
+    padding: 1.5rem;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(10px);
+    border-radius: 1rem;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    margin: 2rem auto;
+}
 .letter:hover {
     transform: scale(1.05) !important;
 }
 .gradient-text {
-    background: white;
+    color: transparent;
+    background: linear-gradient(
+        270deg,
+        #ff00cc,
+        #3333ff,
+        #00ffcc,
+        #ffcc00,
+        #ff00cc
+    );
+    background-size: 1000% 1000%;
     -webkit-background-clip: text;
     background-clip: text;
-    color: transparent;
+    animation: holoAnim 8s ease infinite;
+    text-shadow:
+        0 0 5px #ff00cc,
+        0 0 10px #3333ff,
+        0 0 15px #00ffcc,
+        0 0 20px #ffcc00;
     display: inline-block;
-    padding: 0 2px;
-    transition: transform 0.3s ease;
+    padding: 0;
+    position: relative;
+    filter: drop-shadow(0 0 8px rgba(138, 43, 226, 0.5));
+}
+
+@keyframes holoAnim {
+    0% {
+        background-position: 0% 50%;
+        text-shadow:
+            0 0 5px #ff00cc,
+            0 0 10px #3333ff,
+            0 0 15px #00ffcc,
+            0 0 20px #ffcc00;
+    }
+    50% {
+        background-position: 100% 50%;
+        text-shadow:
+            0 0 10px #ff00cc,
+            0 0 15px #3333ff,
+            0 0 20px #00ffcc,
+            0 0 25px #ffcc00;
+    }
+    100% {
+        background-position: 0% 50%;
+        text-shadow:
+            0 0 5px #ff00cc,
+            0 0 10px #3333ff,
+            0 0 15px #00ffcc,
+            0 0 20px #ffcc00;
+    }
+}
+.letter {
     position: relative;
 }
 
-.letter:hover .gradient-text {
-    transform: scale(1.1);
+.letter::after {
+    content: attr(data-text);
+    position: absolute;
+    left: 0;
+    top: 2px;
+    color: rgba(0,0,0,0.3);
+    z-index: -1;
+    filter: blur(2px);
+    transform: scale(1.02);
+    opacity: 0.7;
+    -webkit-text-stroke: 1px rgba(0,0,0,0.1);
 }
-@keyframes float {
-    0%, 100% {
-        transform: translateY(0) rotateX(0deg);
-    }
-    50% {
-        transform: translateY(-20px) rotateX(5deg);
-    }
+.letter:hover .gradient-text {
+    animation: holoAnim 4s ease infinite;
+    filter: drop-shadow(0 0 12px rgba(138, 43, 226, 0.8));
+    text-shadow:
+        0 0 10px #ff00cc,
+        0 0 20px #3333ff,
+        0 0 30px #00ffcc,
+        0 0 40px #ffcc00;
 }
 /* iOS Glass Button Effect */
 a[href="#services"] {
@@ -113,26 +168,148 @@ a[href="#services"]:before {
 a[href="#services"]:hover:before {
     transform: rotate(30deg) translateY(5px);
 }
-/* Service & Team card hover effects */
-.service-card, .team-card, .contact-method {
-    transform-origin: center;
-    box-shadow: 
-        0 10px 15px -5px rgba(255,0,0,0.1),
-        0 10px 20px -10px rgba(0,255,255,0.1),
-        0 10px 30px -10px rgba(0,0,0,0.3);
-    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+/* Services Section */
+#services {
+    background: linear-gradient(to bottom, rgba(0,0,0,0.95), rgba(0,0,0,0.85));
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    border-top: 1px solid rgba(255,255,255,0.1);
 }
 
-.service-card:hover, .team-card:hover, .contact-method:hover {
-    box-shadow: 0 20px 40px -10px rgba(126, 34, 206, 0.3);
+#services .bg-gray-800\/85 {
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    opacity: 0;
+    transform: translateY(100px);
+    animation: serviceSlideIn 1s ease-out forwards;
+    animation-timeline: view();
+    animation-range: entry 10% cover 30%;
 }
 
-.team-card {
-    cursor: default;
+@keyframes serviceSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(100px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-.contact-method a {
-    transition: color 0.3s ease;
+#services .bg-gray-800\/85:nth-child(2) {
+    animation-delay: 100ms;
+}
+
+#services .bg-gray-800\/85:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    border-color: rgba(255,255,255,0.2);
+}
+
+#services .bg-gray-700\/50 {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: all 0.6s ease;
+    animation: serviceItemSlideIn 0.8s ease-out forwards;
+    animation-timeline: view();
+    animation-range: entry 10% cover 30%;
+}
+
+@keyframes serviceItemSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#services .bg-gray-700\/50:nth-child(1) {
+    animation-delay: 150ms;
+}
+#services .bg-gray-700\/50:nth-child(2) {
+    animation-delay: 200ms;
+}
+#services .bg-gray-700\/50:nth-child(3) {
+    animation-delay: 250ms;
+}
+#services .bg-gray-700\/50 {
+    transition: all 0.2s ease;
+}
+
+#services .bg-gray-700\/50:hover {
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.15);
+}
+/* Contact Section */
+#contact .contact-method {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    opacity: 0;
+    transform: translateY(100px);
+    animation: contactSlideIn 0.8s ease-out forwards;
+    animation-timeline: view();
+    animation-range: entry 10% cover 30%;
+}
+
+@keyframes contactSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(100px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#contact .contact-method:nth-child(1) { animation-delay: 0ms; }
+#contact .contact-method:nth-child(2) { animation-delay: 100ms; }
+
+#contact .contact-method:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+}
+
+/* Team Section */
+#team .bg-gray-800\/50 {
+    transition: transform 0.3s ease, border-color 0.3s ease;
+    opacity: 0;
+    transform: scale(0.8);
+    animation: teamCardAppear 0.8s ease-out forwards;
+    animation-timeline: view();
+    animation-range: entry 10% cover 30%;
+}
+
+@keyframes teamCardAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+#team .bg-gray-800\/50:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+#team .bg-gray-800\/50:nth-child(1) { animation-delay: 0ms; }
+#team .bg-gray-800\/50:nth-child(2) { animation-delay: 100ms; }
+#team .bg-gray-800\/50:nth-child(3) { animation-delay: 200ms; }
+#team .bg-gray-800\/50:nth-child(4) { animation-delay: 300ms; }
+#team .bg-gray-800\/50:nth-child(5) { animation-delay: 400ms; }
+/* Icon containers */
+[class*="bg-"]\/10 {
+    transition: transform 0.3s ease;
+}
+
+[class*="bg-"]\/10:hover {
+    transform: rotate(10deg) scale(1.1);
 }
 /* Scroll indicator animation */
 @keyframes bounce {
@@ -149,4 +326,25 @@ a[href="#services"]:hover:before {
 
 .animate-bounce {
     animation: bounce 2s infinite;
+}
+
+/* --- ADD or UPDATE these styles --- */
+#magic {
+    position: relative;
+    margin: 0 auto;
+    width: 700px;   /* Adjust width for your layout */
+    height: 220px;   /* Adjust height as you like */
+    z-index: 3;
+    background: transparent;
+    pointer-events: auto;
+}
+@media (max-width: 800px) {
+    #magic {
+        width: 90vw;
+        height: 120px;
+    }
+}
+/* Optionally, hide the old spans/h1 in logo-container */
+#logo-container h1, #logo-reflection, #logo-starburst {
+    display: none !important;
 }
